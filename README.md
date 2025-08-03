@@ -20,4 +20,9 @@ I was unable to get the code compile with VSCode and the Arduino Maker Workshop 
 ### Flashing the ATTINY85
 For the ATTINY85, flashing it involves plugging in the USB cable *after* flashing has been intiated on the PC. This is because the ATTINY85 has a short delay of a few seconds upon power on for it to enter flashing mode, and flashing cannot begin after this delay has passed. It also explains why it takes about 5sec after power on to show anything on the neopixels.
 
+## Lightbox and stencils
+The lightbox reflects light out from the box along a parabolic curve that gives the effect of 8 straightish beams of light that appear to be extending behind the light box indefinitely. The lightbox can also be run without any stencil, giving full view of the light beams (this is what 'neon vectors' alludes to).
 
+A stencil with holes to reveal the light can be slotted into the front of the light box, and it is interchangable for any stencil that fits. The dimensions for the stencil are 100mm wide by 140mm high and 1.5mm thick. The original stencil has a 1mm chamfer to help with sliding the stencil in but this is not essential because the slot is oversized (~3mm but probably slightly smaller after 3d printing due to tolerances). While the original stencil is 3d printed, other materials such as card can be used. A black stencil is most effective to contrast with the light shining from inside the lightbox, but any colour will work.
+
+Have fun!
