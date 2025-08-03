@@ -1,17 +1,21 @@
+//code for ATTINY85 neonvectors light box by BeansMachines
+//with signficant code for rainbow mode borrowed from https://github.com/smartynov/iotfun/blob/master/arduino/deco_lights/deco_lights.ino
 
-//USE ONE SET OF INCLUDES FOR YOUR IDE
+
+//USE JUST ONE SET OF LIBRARY INCLUDES DEPENDING ON YOUR IDE
+
 //Arduino IDE
-/*
 #include <Adafruit_NeoPixel.h> //Adafruit Neopixel by Adafruit version 1.11.0 installed (in Arduino IDE, just have the .h file name without the folder)
 #include <EEPROM.h> //arduino native probably
-*/
 
-//vscode with arduino maker workshop
-#include <./Adafruit_NeoPixel/Adafruit_NeoPixel.h> //Adafruit Neopixel by Adafruit version 1.11.0 installed (in Arduino IDE, just have the .h file name without the folder)
+/*
+//NOT YET WORKING: testing vscode with arduino maker workshop
+//#include <./Adafruit_NeoPixel/Adafruit_NeoPixel.h> //Adafruit Neopixel by Adafruit version 1.11.0 installed (in Arduino IDE, just have the .h file name without the folder)
 #include <C:\Users\chris\AppData\Local\Arduino15\packages\ATTinyCore\hardware\avr\1.5.2\libraries\EEPROM\EEPROM.h> //arduino native probably
 #include <C:\Users\chris\AppData\Local\Arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\avr\include\inttypes.h> //required for vscode
 #include <C:\Users\chris\AppData\Local\Arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\avr\include\stdint.h> //required for vscode
 //#include <C:\Users\chris\AppData\Local\Arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\lib\gcc\avr\7.3.0\include\stdint.h>
+*/
 
 // set to pin connected to data input of WS8212 (NeoPixel) strip
 #define PIN         2
@@ -63,10 +67,11 @@ int eepromreadvalue1;
 int eepromreadvalue2;
 uint8_t eepromwritevalue;
 bool neonmode = false;
-bool gentleglowmode = false;
+bool fireglowmode = false;
 
 void setup() {
 
+  //recall last used mode and set current mode
   eepromroutine();
   
   // initialize pseudo-random number generator with some random value
@@ -89,16 +94,15 @@ void setup() {
     neonmodeloop();
   }
 
-  if(gentleglowmode == true){
-      //gentle glow mode
-      gentlegloweffect();
+  if(fireglowmode == true){
+      //fire glow mode
+      firegloweffect();
   }
 
 }
 
+//main loop is for rainbow mode only
 void loop() {
-
-
 
   // use real time to recalculate position of each color spot
   long ms = millis();
@@ -154,10 +158,7 @@ void loop() {
 
 
 void eepromroutine(){
-  //EEPROM IS EMULATED ON CLONE ARDUINOS and won't survive a power-cycle; however it will work when pressing reset button  
   EEPROM.get(eepromaddress, eepromreadvalue1);
-  //Serial.print("eeprom read 1: ");
-  //Serial.println(eepromreadvalue1);
 
   //for power on or having issues
   if(eepromreadvalue1 == 0 || eepromreadvalue1 == 1 || eepromreadvalue1 == 2){
@@ -166,46 +167,54 @@ void eepromroutine(){
   
   if(eepromreadvalue1 == 0){
     neonmode = false;
-    gentleglowmode = false;
+    fireglowmode = false;
     eepromwritevalue = eepromreadvalue1 + 1;
     EEPROM.put(eepromaddress, eepromwritevalue);
   } else if(eepromreadvalue1 == 1){
     neonmode = true;
-    gentleglowmode = false;
+    fireglowmode = false;
     eepromwritevalue = eepromreadvalue1 + 1;
     EEPROM.put(eepromaddress, eepromwritevalue);
   } else if(eepromreadvalue1 == 2){
     neonmode = false;
-    gentleglowmode = true;
+    fireglowmode = true;
     eepromwritevalue = eepromreadvalue1 - 2;
     EEPROM.put(eepromaddress, eepromwritevalue);
   }
-  // Serial.print("rainbow mode: ");
-  // Serial.println(neonmode);
-  // Serial.print("gentle glow mode: ");
-  // Serial.println(gentleglowmode);
 
   EEPROM.get(eepromaddress, eepromreadvalue2);
-  // Serial.print("eeprom read 2: ");
-  // Serial.println(eepromreadvalue2);
 }
 
 void neonmodeloop(){
   while(1==1){
     for(int i=0; i<8; i++){
-      strip.setPixelColor(i,255,40,100);
+      strip.setPixelColor(i,255,40,150);
     }
     strip.show();
     delay(5000);
   }
 }
-  
-void gentlegloweffect(){
+
+void firegloweffect(){
+  //effect vars
+  int red = 255;
+  int green = 60;
+  int redglow;
+  int greenglow;
+
     while(1==1){
-    for(int i=0; i<8; i++){
-      strip.setPixelColor(i,0,255,200);
+      
+      for(int i=0; i<NUMPIXELS; i++) {
+        int flicker = random(0,64);
+        redglow = red - flicker;
+        greenglow = green - flicker;
+        if(redglow<0){redglow = 0;}
+        if(greenglow<0){greenglow = 0;}
+        strip.setPixelColor(i, strip.Color(redglow, greenglow, 0));
+      }
+      strip.show();
+    
+      delay(random(20,255));
     }
-    strip.show();
-    delay(5000);
-  }
+  //}
 }
